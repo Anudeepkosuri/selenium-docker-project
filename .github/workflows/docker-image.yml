@@ -14,5 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag selenium-tests:$(date +%s)
+
+    - name: Run Selenium Tests
+      run: docker run --rm selenium-tests:$(date +%s)
