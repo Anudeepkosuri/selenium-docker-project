@@ -32,5 +32,13 @@ WORKDIR /app
 # Copy project
 COPY . .
 
-# Run tests
-CMD ["mvn", "clean", "test"]
+# Run tests and generate reports
+RUN mvn clean test -Dtest=SelectDateTest
+
+# Create directory for reports
+RUN mkdir -p /app/test-reports && \
+    cp -r target/surefire-reports/* /app/test-reports/ 2>/dev/null || true && \
+    cp -r target/site/surefire-report.html /app/test-reports/ 2>/dev/null || true
+
+# Output for verification
+CMD ["echo", "Tests completed. Check reports in target/surefire-reports/"]

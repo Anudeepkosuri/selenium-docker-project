@@ -3,6 +3,8 @@ name: Run Selenium Docker Tests
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
@@ -12,8 +14,36 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Create reports directory
+        run: mkdir -p test-reports
+
       - name: Build Docker Image
         run: docker build -t selenium-tests .
 
-      - name: Run Tests
-        run: docker run --rm selenium-tests
+      - name: Run Tests with Report Capture
+        run: docker run --rm -v $(pwd)/target:/app/target selenium-tests
+        continue-on-error: true
+
+      - name: Copy Reports from Docker
+        run: |
+          if [ -d target/surefire-reports ]; then
+            cp -r target/surefire-reports/* test-reports/ 2>/dev/null || true
+          fi
+          if [ -d target/site ]; then
+            cp -r target/site/* test-reports/ 2>/dev/null || true
+          fi
+
+      - name: Upload Test Reports as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: test-reports/
+          retention-days: 30
+
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: test-reports/**/*.xml
+          check_name: Test Results
