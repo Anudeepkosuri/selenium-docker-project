@@ -1,0 +1,11 @@
+stages:
+  - test
+
+run_selenium_tests:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t selenium-tests .
+    - docker run selenium-tests
