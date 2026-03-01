@@ -1,22 +1,19 @@
-name: Docker Image CI
+name: Run Selenium Docker Tests
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag selenium-tests:$(date +%s)
+      - name: Build Docker Image
+        run: docker build -t selenium-tests .
 
-    - name: Run Selenium Tests
-      run: docker run --rm selenium-tests:$(date +%s)
+      - name: Run Tests
+        run: docker run --rm selenium-tests
