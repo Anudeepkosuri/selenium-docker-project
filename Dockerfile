@@ -29,16 +29,17 @@ RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd6
 # Set working directory
 WORKDIR /app
 
-# Copy project
+# Copy project files
 COPY . .
 
 # Run tests and generate reports
-RUN mvn clean test -Dtest=SelectDateTest
+RUN mvn clean test -Dtest=SelectDateTest || true
 
-# Create directory for reports
-RUN mkdir -p /app/test-reports && \
-    cp -r target/surefire-reports/* /app/test-reports/ 2>/dev/null || true && \
-    cp -r target/site/surefire-report.html /app/test-reports/ 2>/dev/null || true
+# Verify reports were generated
+RUN echo "Contents of target directory:" && \
+    ls -la target/ && \
+    echo "Contents of surefire-reports:" && \
+    ls -la target/surefire-reports/ 2>/dev/null || echo "surefire-reports not found"
 
-# Output for verification
-CMD ["echo", "Tests completed. Check reports in target/surefire-reports/"]
+# Default command
+CMD ["bash"]

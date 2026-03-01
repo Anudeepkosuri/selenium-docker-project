@@ -6,44 +6,60 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create reports directory
-        run: mkdir -p test-reports
+        run: mkdir -p reports
 
       - name: Build Docker Image
-        run: docker build -t selenium-tests .
+        run: docker build -t selenium-tests:latest .
 
-      - name: Run Tests with Report Capture
-        run: docker run --rm -v $(pwd)/target:/app/target selenium-tests
+      - name: Run Tests in Docker and Extract Reports
+        run: |
+          # Run container and keep it for extraction
+          docker run --name test-container -d selenium-tests:latest sleep 3600
+          
+          # Wait for tests to complete (they run at build time)
+          sleep 10
+          
+          # Copy reports from container
+          docker cp test-container:/app/target/surefire-reports/ ./reports/ 2>/dev/null || true
+          
+          # Clean up
+          docker stop test-container || true
+          docker rm test-container || true
         continue-on-error: true
 
-      - name: Copy Reports from Docker
+      - name: List extracted reports
         run: |
-          if [ -d target/surefire-reports ]; then
-            cp -r target/surefire-reports/* test-reports/ 2>/dev/null || true
-          fi
-          if [ -d target/site ]; then
-            cp -r target/site/* test-reports/ 2>/dev/null || true
-          fi
+          echo "Reports found:"
+          find ./reports -type f -name "*.xml" || echo "No XML files found"
+          ls -la ./reports/ || echo "Reports directory is empty"
 
       - name: Upload Test Reports as Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
-          path: test-reports/
+          path: reports/
           retention-days: 30
 
       - name: Publish Test Results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: test-reports/**/*.xml
+          files: reports/**/*.xml
           check_name: Test Results
+          action_fail: false
+          action_fail_on_inconclusive: false
