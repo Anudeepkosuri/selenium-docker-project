@@ -62,15 +62,7 @@
         │ Store for 30 days                       │
         │ Downloadable from Actions tab           │
         └─────────────────────────────────────────┘
-                              ↓
-        ┌─────────────────────────────────────────┐
-        │ Step 7️⃣: Publish Test Results            │
-        │ EnricoMi/publish-unit-test@v2           │
-        │ Parse: TEST-SelectDateTest.xml          │
-        │ Create GitHub Check                     │
-        │ Show: "1 passed, 0 failed"              │
-        └─────────────────────────────────────────┘
-                              ↓
+                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │                    WORKFLOW COMPLETE                            │
 │                                                                 │
@@ -85,10 +77,10 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 5: GitHub Actions & Publishing                           │
+│  LAYER 5: GitHub Actions & Artifact Storage                    │
 │  ├─ Orchestrates entire workflow                               │
 │  ├─ Manages artifacts                                          │
-│  └─ Publishes results                                          │
+│  └─ Stores test reports                                        │
 ├─────────────────────────────────────────────────────────────────┤
 │  LAYER 4: Test Execution & Report Generation                    │
 │  ├─ Maven runs tests                                           │
@@ -161,16 +153,13 @@ HOST MACHINE (GitHub Actions Runner)
 │
 └─ Uploads to GitHub Artifacts
 
-                ⬇ publishing ⬇
+                ⬇ artifact storage ⬇
 
 GITHUB RESULTS
 │
 ├─ Actions Tab
 │  ├─ Workflow logs
 │  └─ Artifacts (downloadable)
-│
-├─ PR Checks
-│  └─ Test results summary
 │
 └─ Commit Status
    └─ Pass/Fail indicator
@@ -322,7 +311,6 @@ GITHUB RESULTS
 │   4. Run container & extract reports                         │
 │   5. List extracted reports                                  │
 │   6. Upload artifacts                                        │
-│   7. Publish test results (EnricoMi)                         │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -337,19 +325,15 @@ INSIDE DOCKER CONTAINER:
 
 EXTRACTED TO HOST:
 ./reports/surefire-reports/
-├── TEST-SelectDateTest.xml     ← Used by EnricoMi
-├── index.html                  ← Used by humans
-└── SelectDateTest.txt          ← Used by logs
+├── TEST-SelectDateTest.xml     ← Surefire format (CI-friendly)
+├── index.html                  ← HTML summary
+└── SelectDateTest.txt          ← Text format
 
 GITHUB ARTIFACTS:
 Actions > Artifacts > test-reports
 ├── surefire-reports/
 │   └── (all extracted files)
 └── Downloadable for 30 days
-
-PUBLISHED RESULTS:
-GitHub PR Checks / Actions / Summary
-└── "1 passed, 0 failed"
 ```
 
 ## ⚡ Quick Command Reference
@@ -394,8 +378,6 @@ After pipeline runs:
 - [ ] Tests executed (✅)
 - [ ] Reports extracted (✅)
 - [ ] Artifacts uploaded (✅)
-- [ ] Results published (✅)
-- [ ] Check on PR shows test results (✅)
 
 ## 🔗 Important Files & Locations
 
@@ -413,4 +395,3 @@ After pipeline runs:
 ---
 
 **Remember**: Every `git push` triggers automatic testing! 🚀
-

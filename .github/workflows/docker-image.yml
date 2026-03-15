@@ -54,13 +54,3 @@ jobs:
           name: test-reports
           path: reports/
           retention-days: 30
-
-      - name: Publish Test Results
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: |
-            reports/surefire-reports/TEST-*.xml
-          check_name: Test Results
-          action_fail: false
-          action_fail_on_inconclusive: false

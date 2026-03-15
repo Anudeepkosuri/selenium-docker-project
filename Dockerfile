@@ -32,14 +32,18 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Run tests and generate reports
-RUN mvn clean test -Dtest=SelectDateTest || true
+# Run tests with verbose output
+RUN mvn clean test -Dtest=SelectDateTest -DfailIfNoTests=false || true
 
-# Verify reports were generated
-RUN echo "Contents of target directory:" && \
-    ls -la target/ && \
-    echo "Contents of surefire-reports:" && \
-    ls -la target/surefire-reports/ 2>/dev/null || echo "surefire-reports not found"
+# List all directories created to verify test execution
+RUN echo "=== Listing /app/target ===" && \
+    ls -la /app/target/ || echo "No target directory"
 
-# Default command
+RUN echo "=== Listing /app/target/surefire-reports ===" && \
+    ls -la /app/target/surefire-reports/ 2>/dev/null || echo "No surefire-reports directory yet"
+
+RUN echo "=== Looking for any XML files ===" && \
+    find /app/target -name "*.xml" -type f 2>/dev/null || echo "No XML files found"
+
+# Default command - keep container alive
 CMD ["bash"]

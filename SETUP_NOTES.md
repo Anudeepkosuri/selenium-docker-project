@@ -21,7 +21,7 @@ This is a **Selenium Automation Testing Project** with integrated **CI/CD pipeli
 - ✅ Automated browser testing using Selenium WebDriver
 - ✅ Containerized test execution with Docker
 - ✅ Continuous Integration with GitHub Actions & GitLab CI
-- ✅ Automated test report generation and publishing
+- ✅ Automated test report generation
 - ✅ TestNG framework for test management
 
 **Main Test**: `SelectDateTest.java` - Opens a website, fills in a date field in a web form
@@ -45,9 +45,7 @@ Developer Push Code
         ↓
    [Generate Reports]
         ↓
-   [Publish Results]
-        ↓
-   [Test Summary Report]
+   [Store Artifacts]
 ```
 
 ### Component Diagram
@@ -91,7 +89,6 @@ Project Repository
 | **CI/CD - GitHub** | GitHub Actions | Latest | GitHub-hosted CI/CD |
 | **CI/CD - GitLab** | GitLab CI | Latest | GitLab-hosted CI/CD |
 | **Data Handling** | Apache POI | 5.5.1 | Excel file processing |
-| **Report Publishing** | EnricoMi | v2 | Publish results to GitHub |
 
 ### Dependencies (from pom.xml)
 
@@ -152,7 +149,7 @@ This project is configured for **BOTH** GitHub Actions AND GitLab CI. Each platf
 - **Trigger**: Push to `main` branch or Pull Request
 - **Platform**: GitHub-hosted runners
 - **Advantage**: Integrated with GitHub, easy artifact management
-- **Reports**: Published as GitHub Checks (visible on PR)
+- **Reports**: Available as downloadable artifacts
 
 #### **GitLab CI** (ALTERNATIVE)
 - **Trigger**: Push to repository
@@ -355,33 +352,17 @@ This project is configured for **BOTH** GitHub Actions AND GitLab CI. Each platf
         │  - Visible in Artifacts tab                      │
         └───────────────────────────────────────────────────┘
                               ↓
-        ┌───────────────────────────────────────────────────┐
-        │  Step 7: Publish Test Results                    │
-        │  (uses: EnricoMi/publish-unit-test-result@v2)   │
-        │                                                  │
-        │  files: reports/surefire-reports/TEST-*.xml      │
-        │                                                  │
-        │  - Reads Surefire XML format reports             │
-        │  - Parses test results                           │
-        │  - Creates GitHub Check                          │
-        │  - Posts summary to PR (if applicable)           │
-        │  - Shows: "1 passed, 0 failed" etc.             │
-        └───────────────────────────────────────────────────┘
-                              ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FINAL RESULT                                 │
 │                                                                 │
 │  ✅ Workflow Completed                                          │
 │  ✅ Tests Executed                                              │
 │  ✅ Reports Generated                                           │
-│  ✅ Results Published                                           │
 │  ✅ Artifacts Available                                         │
 │                                                                 │
 │  View in GitHub:                                                │
 │  - Actions tab: See workflow run details                        │
 │  - Artifacts: Download test reports                            │
-│  - PR Checks: See test summary (if PR)                          │
-└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -427,13 +408,7 @@ This project is configured for **BOTH** GitHub Actions AND GitLab CI. Each platf
    └─ Upload to GitHub
    └─ Store for 30 days
 
-8. PUBLISH RESULTS
-   └─ Read XML reports
-   └─ Parse test results
-   └─ Create GitHub Check
-   └─ Comment on PR (if applicable)
-
-9. COMPLETE
+8. COMPLETE
    └─ Workflow finished
    └─ Results visible in GitHub
 ```
@@ -614,17 +589,6 @@ Steps:
    - Upload reports to GitHub
    - Keep for 30 days
    - Downloadable from Actions tab
-
-7. Publish Results
-   uses: EnricoMi/publish-unit-test-result-action@v2
-   with:
-     files: reports/surefire-reports/TEST-*.xml
-     check_name: Test Results
-     action_fail: false
-   - Parse XML test results
-   - Create GitHub Check
-   - Show pass/fail counts
-   - Don't fail workflow on test failures
 ```
 
 ### 5. **.gitlab-ci.yml** - GitLab CI Configuration (Alternative)
@@ -847,8 +811,7 @@ docker run -it selenium-tests bash
 3. **Docker Build** → Install deps + run tests
 4. **Report Generation** → Inside Docker
 5. **Extract Reports** → From container to host
-6. **Publish Results** → Show in GitHub/GitLab
-7. **Store Artifacts** → Available for download
+6. **Store Artifacts** → Available for download
 
 ### Report Formats
 
@@ -888,7 +851,7 @@ GitHub Actions: .github/workflows/docker-image.yml
 - Builds Docker image
 - Runs container
 - Extracts reports
-- Publishes results to GitHub
+- Stores artifacts
 
 TestNG: testng.xml
 - Specifies which test class to run
@@ -906,9 +869,6 @@ This is a **complete automated testing infrastructure**:
 ✅ **Containerize** → Dockerfile (Docker)
 ✅ **Automate** → GitHub Actions (CI/CD)
 ✅ **Report** → Surefire XML + HTML (Results)
-✅ **Publish** → EnricoMi + GitHub (Visibility)
+✅ **Store** → Artifacts available for download
 
 **Every push triggers a fully automated test run with reports!**
-
-
-
