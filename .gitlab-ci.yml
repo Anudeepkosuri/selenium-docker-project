@@ -12,4 +12,10 @@ run_selenium_tests:
   script:
     - docker build -t selenium-tests .
     - docker run --rm selenium-tests
+  artifacts:
+    paths:
+      - target/surefire-reports/
+      - target/site/surefire-report.html
+    expire_in: 1 week
+    when: always
   allow_failure: false

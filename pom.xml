@@ -36,6 +36,7 @@
             <artifactId>testng</artifactId>
             <version>7.11.0</version>
             <scope>test</scope>
+
         </dependency>
 
 
@@ -78,6 +79,12 @@
                     <useFile>true</useFile>
                     <!-- Disable TestNG native XML format -->
                     <disableXmlReport>false</disableXmlReport>
+                    <properties>
+                        <property>
+                            <name>usedefaultlisteners</name>
+                            <value>false</value>
+                        </property>
+                    </properties>
                 </configuration>
             </plugin>
 
